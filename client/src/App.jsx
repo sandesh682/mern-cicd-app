@@ -67,7 +67,7 @@ function App() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>Todo App</h1>
+      <h1 style={styles.title}>Sandesh Todo App</h1>
 
       {/* Add Todo */}
       <div style={styles.inputRow}>
