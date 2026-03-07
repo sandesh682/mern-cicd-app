@@ -15,7 +15,7 @@ services:
       - mern_network
 
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/todos || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/todos"]
       interval: 30s
       timeout: 10s
       retries: 3
