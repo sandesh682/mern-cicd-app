@@ -1,9 +1,15 @@
 const express = require("express");
 const path = require("path");
 const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  }),
+);
 app.use(express.json());
 
 // MongoDB connection
@@ -124,16 +130,6 @@ app.delete("/api/todos/:id", async (req, res) => {
     return sendError(res, "Failed to delete todo");
   }
 });
-
-// ─── Serve React Frontend (Production) ───────────────────────────────────────
-
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-
-  app.use((req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
-  });
-}
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 
