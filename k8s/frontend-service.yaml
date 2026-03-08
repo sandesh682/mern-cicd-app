@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mern-frontend-service
+  labels:
+    app: mern-frontend
+spec:
+  selector:
+    app: mern-frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 80
+  type: LoadBalancer
+  # LoadBalancer = exposes the frontend to your browser
+  # Locally on Docker Desktop: accessible at http://localhost:3000
+  # On AWS EKS: will get an external IP automatically
