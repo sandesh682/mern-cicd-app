@@ -108,7 +108,7 @@ app.post("/api/todos", async (req, res) => {
     if (err.name === "ValidationError") {
       return sendError(res, err.message, 400);
     }
-    return sendError(res, "Failed to create todo");
+    return sendError(res, "Failed to create a todo");
   }
 });
 
