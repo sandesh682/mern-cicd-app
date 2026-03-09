@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL || "";
-
 function App() {
   const [todos, setTodos] = useState([]);
   const [text, setText] = useState("");
@@ -11,7 +9,7 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const fetchTodos = async () => {
-    const res = await axios.get(`${API}/api/todos`);
+    const res = await axios.get(`/api/todos`);
     setTodos(res.data.data);
   };
 
@@ -19,7 +17,7 @@ function App() {
     let isMounted = true;
 
     const loadTodos = async () => {
-      const res = await axios.get(`${API}/api/todos`);
+      const res = await axios.get(`/api/todos`);
       if (isMounted) setTodos(res.data.data);
     };
 
@@ -33,14 +31,14 @@ function App() {
   const addTodo = async () => {
     if (!text.trim()) return;
     setLoading(true);
-    await axios.post(`${API}/api/todos`, { text });
+    await axios.post(`/api/todos`, { text });
     setText("");
     await fetchTodos();
     setLoading(false);
   };
 
   const toggleDone = async (todo) => {
-    await axios.put(`${API}/api/todos/${todo._id}`, {
+    await axios.put(`/api/todos/${todo._id}`, {
       text: todo.text,
       done: !todo.done,
     });
@@ -48,7 +46,7 @@ function App() {
   };
 
   const deleteTodo = async (id) => {
-    await axios.delete(`${API}/api/todos/${id}`);
+    await axios.delete(`/api/todos/${id}`);
     await fetchTodos();
   };
 
@@ -59,7 +57,7 @@ function App() {
 
   const saveEdit = async () => {
     if (!editText.trim()) return;
-    await axios.put(`${API}/api/todos/${editId}`, { text: editText });
+    await axios.put(`/api/todos/${editId}`, { text: editText });
     setEditId(null);
     setEditText("");
     await fetchTodos();
