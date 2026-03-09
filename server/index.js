@@ -6,18 +6,20 @@ require("dotenv").config();
 
 const app = express();
 const allowedOrigins = [
-  "http://localhost:5173", // Vite local dev
-  "http://localhost:3000", // local docker
   "http://3.26.0.207:3000", // EC2 frontend
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        origin.startsWith("http://localhost:")
+      ) {
         callback(null, true);
       } else {
-        callback(new Error("CORS not allowed"));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
