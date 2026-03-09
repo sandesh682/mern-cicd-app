@@ -22,20 +22,22 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build Backend (MULTI-ARCH)
+      # Backend Image
       - name: Build & Push Backend Image
         run: |
           docker buildx build \
           --platform linux/amd64,linux/arm64 \
+          -t sandeshnangare/mern-server:${{ github.sha }} \
           -t sandeshnangare/mern-server:latest \
           ./server \
           --push
 
-      # Build Frontend (MULTI-ARCH)
+      # Frontend Image
       - name: Build & Push Frontend Image
         run: |
           docker buildx build \
           --platform linux/amd64,linux/arm64 \
+          -t sandeshnangare/mern-client:${{ github.sha }} \
           -t sandeshnangare/mern-client:latest \
           ./client \
           --push
