@@ -11,6 +11,8 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      infrastructure: ${{ steps.filter.outputs.infrastructure }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,10 +24,13 @@ jobs:
               - 'server/**'
             frontend:
               - 'client/**'
+            infrastructure:
+              - 'docker-compose.yml'
+              - '.github/workflows/**'
 
   build-backend:
     needs: detect-changes
-    if: needs.detect-changes.outputs.backend == 'true'
+    if: needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.infrastructure == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -41,15 +46,15 @@ jobs:
       - name: Build & Push Backend
         run: |
           docker buildx build \
-          --platform linux/amd64,linux/arm64 \
-          -t sandeshnangare/mern-server:${{ github.sha }} \
-          -t sandeshnangare/mern-server:latest \
-          ./server \
-          --push
+            --platform linux/amd64,linux/arm64 \
+            -t sandeshnangare/mern-server:${{ github.sha }} \
+            -t sandeshnangare/mern-server:latest \
+            ./server \
+            --push
 
   build-frontend:
     needs: detect-changes
-    if: needs.detect-changes.outputs.frontend == 'true'
+    if: needs.detect-changes.outputs.frontend == 'true' || needs.detect-changes.outputs.infrastructure == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -65,11 +70,11 @@ jobs:
       - name: Build & Push Frontend
         run: |
           docker buildx build \
-          --platform linux/amd64,linux/arm64 \
-          -t sandeshnangare/mern-client:${{ github.sha }} \
-          -t sandeshnangare/mern-client:latest \
-          ./client \
-          --push
+            --platform linux/amd64,linux/arm64 \
+            -t sandeshnangare/mern-client:${{ github.sha }} \
+            -t sandeshnangare/mern-client:latest \
+            ./client \
+            --push
 
   deploy:
     needs: [build-backend, build-frontend]
@@ -85,6 +90,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/mern-cicd-app
-            /usr/local/bin/docker-compose pull
-            /usr/local/bin/docker-compose down
-            /usr/local/bin/docker-compose up -d
+
+            # recreate env file from GitHub secrets
+            rm -f server/.env
+
+            cat <<EOF > server/.env
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            PORT=8000
+            EOF
+
+            chmod 600 server/.env
+
+            docker compose pull
+            docker compose up -d --remove-orphans
