@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -21,18 +22,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Build Backend (MULTI-ARCH)
       - name: Build & Push Backend Image
         run: |
           docker buildx build \
-          --platform linux/amd64 \
+          --platform linux/amd64,linux/arm64 \
           -t sandeshnangare/mern-server:latest \
           ./server \
           --push
 
+      # Build Frontend (MULTI-ARCH)
       - name: Build & Push Frontend Image
         run: |
           docker buildx build \
-          --platform linux/amd64 \
+          --platform linux/amd64,linux/arm64 \
           -t sandeshnangare/mern-client:latest \
           ./client \
           --push
